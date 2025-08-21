@@ -15,11 +15,8 @@ class Fetcher:
     def get_data(self):
 
         collection = self.db[self.collection_name]
-        print(list(collection.find({}, {"_id": 0})))
+        return(list(collection.find({}, {"_id": 0})))
 
 
-if __name__ == '__main__':
-    cl = DataLoader()
-    cl.get_data()
 
 
