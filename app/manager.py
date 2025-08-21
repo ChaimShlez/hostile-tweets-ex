@@ -4,7 +4,8 @@ from app.processor import Processor
 
 class Manager:
     def __init__(self):
-        self.path=r"C:\Users\User\development\data\hostile-tweets-ex\data\weapons.txt"
+        self.path="../data/weapons.txt"
+        self.data=self.run()
 
     def run(self):
         fetcher=Fetcher()
@@ -15,16 +16,20 @@ class Manager:
         proc = Processor(data)
         print(proc.df.head())
         # data = fetcher.get_data()
-        proc.find_word_rare()
+        proc.add_col_rare()
         print(data.columns)
-        proc.finding_emotion_text()
+        proc.add_col_sentiment()
         print(data.columns)
-        proc.find_weapons(self.path)
+        proc.add_col_weapons(self.path)
 
 
         proc.df.rename(columns={'TweetID': 'id','Text':'original_text','WordRare':'rarest_word',}, inplace=True)
 
         return proc.df.to_dict(orient='records')
+
+
+    def display(self):
+        return self.data
 
 
 
