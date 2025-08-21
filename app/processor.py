@@ -4,13 +4,14 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 
 class Processor:
-    def __init__(self):
+    def __init__(self,data):
+        self.df=data
         nltk.download('vader_lexicon')
         self.analyzer = SentimentIntensityAnalyzer()
 
 
 
-    def help_counting(self,text):
+    def find_word_rare(self,text):
         word_counts = Counter(text.split())
         min=float('inf')
         min_word=""
@@ -21,25 +22,46 @@ class Processor:
                 min_word=k
         return min_word
 
-    def find_word_rare(self ,data):
+    def add_col_rare(self):
+
+        self.df['WordRare'] =  self.df['Text'].apply(self.find_word_rare)
 
 
-        data['WordRare'] = data['Text'].apply(self.help_counting)
-        return data
-
-    def help_counting_finding_emotion_text(self,tweet):
+    def finding_emotion_text(self,tweet):
         score = self.analyzer.polarity_scores(tweet)
         compound = score['compound']
-        if 1 > compound > 0.5:
+        if 0.5 < compound <= 1:
             return 'positive'
-        elif 0.49 > compound > -0.49:
+        elif -0.49 <= compound <= 0.49:
             return 'neutral'
-        elif -1 > compound > -0.5:
+        elif -1 <= compound < -0.5:
             return 'negative'
 
-    def finding_emotion_text(self,data):
-        data['Sentiment']= data['Text'].apply(self.help_counting_finding_emotion_text)
-        return data
+    def add_col_sentiment(self):
+        self.df['Sentiment']=  self.df['Text'].apply(self.finding_emotion_text)
+
+
+
+    def find_weapons(self,text,path):
+        with open(path) as f:
+
+
+            weapons=[line.strip().lower() for line in f]
+
+        words = text.split()
+        for weapon in weapons:
+            if weapon in words:
+                return weapon
+        return ""
+
+
+
+    def add_col_weapons(self,path):
+        self.df['weapons_detected'] = self.df['Text'].apply(lambda x: self.find_weapons(x, path))
+
+
+
+
 
 
 
